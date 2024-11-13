@@ -6,6 +6,13 @@ use mysql::*;
 use mysql::prelude::*;
 use serde_json::json;
 use serde_json::Value;
+use reqwest::Client;
+use ollama_rs::{
+    generation::completion::{
+        request::GenerationRequest, GenerationContext,
+    },
+    Ollama,
+};
 
 #[tauri::command]
 fn encrypt_string(value: &str) -> String {
@@ -88,6 +95,19 @@ fn read_mysql_database() -> Result<Value, String> {
     }
 }
 
+#[tauri::command]
+async fn generate_sql(prompt: String) -> String {
+    // By default it will connect to localhost:11434
+    let ollama = Ollama::default();
+
+    let model = "llama3:latest".to_string();
+    let prompt = "Why is the sky blue?".to_string();
+
+    let res = ollama.generate(GenerationRequest::new(model, prompt)).await;
+
+    res.unwrap().response
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let migrations = vec![
@@ -110,7 +130,7 @@ pub fn run() {
                 .build()
         )
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![greet, encrypt_string, decrypt_string, read_mysql_database])
+        .invoke_handler(tauri::generate_handler![greet, encrypt_string, decrypt_string, read_mysql_database, generate_sql])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");
 }

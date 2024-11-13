@@ -80,6 +80,17 @@ function App() {
     console.log(result)
   }
 
+  async function testOllama() {
+    try {
+      const prompt = "Who is the president of France ?"
+      const sqlQuery = await invoke('generate_sql', { prompt });
+      console.log('Response :', sqlQuery);
+      return sqlQuery;
+    } catch (error) {
+      console.error('Error :', error);
+    }
+  }
+
   return (
       <main className="container">
         <h1>Welcome to Tauri + SQLite</h1>
@@ -112,6 +123,11 @@ function App() {
             <div style={{display: "flex", flexDirection: "column", gap: "2rem"}}>
               <button onClick={testMySqlDb}>Test MySQL DB</button>
             </div>
+
+            <div style={{display: "flex", flexDirection: "column", gap: "2rem"}}>
+              <button onClick={testOllama}>Test Ollama</button>
+            </div>
+
             <div style={{display: "flex", flexDirection: "column", gap: "2rem" }}>
                 <h1>Users</h1>
                 <table>
