@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {invoke} from "@tauri-apps/api/core";
 import Database from "@tauri-apps/plugin-sql";
+import ollama from 'ollama'
 import "./App.css";
 
 type User = {
@@ -82,10 +83,11 @@ function App() {
 
   async function testOllama() {
     try {
-      const prompt = "Who is the president of France ?"
-      const sqlQuery = await invoke('generate_sql', { prompt });
-      console.log('Response :', sqlQuery);
-      return sqlQuery;
+      const message = { role: 'user', content: 'list top 10 javascript frameworks' }
+      const response = await ollama.chat({ model: 'llama3.1', messages: [message], stream: true })
+      for await (const part of response) {
+        console.log(part.message.content)
+      }
     } catch (error) {
       console.error('Error :', error);
     }
